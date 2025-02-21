@@ -1,0 +1,10 @@
+@import url('https://fonts.cdnfonts.com/css/samsung-sans-4');
+
+
+* {
+    font-family: 'Samsung Sans', sans-serif !important;
+}
+
+h1 {
+    font-size: 200px !important;
+}
