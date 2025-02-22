@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <section class="hero is-fullheight" style="background: url('{% static "image/login-bg.jpg" %}') no-repeat center center; background-size: cover;">
+        <div class="hero-body">
+            <div class="container">
+                <div class="columns is-centered">
+                    <div class="column is-4-desktop is-6-tablet">
+                        <div class="box" style="box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                            <h1 class="title has-text-centered">Welcome Back!</h1>
+                            <form method="POST" action="/accounts/login/">
+                                {% csrf_token %}
+                                <div class="field">
+                                    <label class="label">Email</label>
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="email" name="email" placeholder="Enter your email" required>
+                                        <span class="icon is-small is-left">
+                    <i class="fas fa-envelope"></i>
+                  </span>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">Password</label>
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="password" name="password" placeholder="Enter your password" required>
+                                        <span class="icon is-small is-left">
+                    <i class="fas fa-lock"></i>
+                  </span>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control">
+                                        <button class="button is-link is-fullwidth">Login</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="has-text-centered">
+                                <a href="/accounts/forgot-password/">Forgot password?</a>
+                            </div>
+                            <hr>
+                            <div class="has-text-centered">
+                                <p>Don't have an account? <a href="/accounts/signup/">Sign Up</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

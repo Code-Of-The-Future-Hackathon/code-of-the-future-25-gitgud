@@ -1,5 +1,447 @@
 {% extends "base.html" %}
 
+{% block title %}Dashboard{% endblock %}
+
 {% block content %}
-<h1>test</h1>
+    <style>
+        /* Dropdown and warning styling */
+        .dropdown-section {
+            margin-bottom: 20px;
+        }
+        .notification {
+            margin-bottom: 20px;
+        }
+        .dropdown-item.is-active {
+            background-color: var(--pistachio);
+        }
+        /* Flex‑based card design so footer stays at the bottom */
+        .card {
+            display: flex;
+            flex-direction: column;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--ebony);
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        .card-header {
+            background-color: #fff;
+            color: var(--ebony);
+            padding: 10px 16px;
+            font-family: 'Samsung Sans', sans-serif;
+            cursor: move;
+        }
+        .card-header .card-header-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .card-content {
+            flex: 1;
+            {#background-color: #fff;#}
+            color: var(--ebony);
+            font-size: 0.95rem;
+            padding: 16px;
+        }
+        .card-footer {
+            border-radius: 0;
+            gap: 7px;
+            padding-bottom: 10px;
+        }
+        .card-footer-item {
+            color: white;
+            background-color: #8ed081;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin: 0;
+            font-size: 0.9rem;
+            transition: background-color 0.2s ease;
+        }
+        .card-footer-item:hover {
+            background-color: #80bb74;
+        }
+        .sortable-placeholder {
+            border: 2px dashed #ccc;
+            /* No extra background so empty space remains clean */
+            min-height: 150px;
+        }
+    </style>
+
+    <!-- Dropdown Selection Section using Bulma's dropdown -->
+    <div class="columns dropdown-section">
+{#        <div class="column">#}
+{#            <h2 class="title is-4">#}
+{#                Selected Pet: <span id="selected-pet">None</span>#}
+{#            </h2>#}
+        <div class="column">
+            <h2 class="title is-4">
+                Selected Pet:
+            </h2>
+        </div>
+        <div class="column is-narrow">
+            <div class="dropdown is-hoverable" id="pet-dropdown-container">
+                <div class="dropdown-trigger">
+                    <button class="button is-rounded" aria-haspopup="true" aria-controls="dropdown-menu">
+                        <span id="dropdown-button-text">Select a Pet</span>
+                        <span class="icon is-small">
+                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                        </span>
+                    </button>
+                </div>
+                <div class="dropdown-menu" id="dropdown-menu" role="menu" style="min-width: auto !important;">
+                    <div class="dropdown-content">
+                        {% if owner_pets %}
+                            {% for pet in owner_pets %}
+                                <a href="#" class="dropdown-item" data-value="{{ pet.id }}" data-display="{{ pet.name }}">
+                                    {% if pet.type|lower == "dog" %}
+                                    <i class="fas fa-dog" style="margin-right:5px;"></i>
+                                    {% elif pet.type|lower == "cat" %}
+                                    <i class="fas fa-cat " style="margin-right:5px;"></i>
+                                    {% elif pet.type|lower == "fish" %}
+                                    <i class="fas fa-fish" style="margin-right:5px;"></i>
+                                    {% else %}
+                                    <i class="fas fa-paw " style="margin-right:5px;"></i>
+                                    {% endif %}
+
+                                    {{ pet.name }}
+                                </a>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Message (hidden by default) -->
+    <div id="no-info-warning" class="notification is-warning" style="display: none;">
+        No pet info available.
+    </div>
+
+    {% for pet in owner_pets %}
+        <div id="widget-container-{{ pet.id }}" class="columns is-multiline" style="display: none;">
+            <!-- Food &amp; Water Card -->
+            <div class="column is-one-third sortable-item" data-widget-id="food-water">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            <i class="fas fa-utensils" style="margin-right:5px;"></i> Food &amp; Water
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            {% with pet.food_logs.all|dictsortreversed:"created_at"|first as log %}
+                                {% if log %}
+                                    <p style="margin: 0;"><strong>Food:</strong> {{ log.quantity }}%
+                                        <progress class="progress is-success" value="{{ log.quantity }}" max="100">
+                                            {{ log.quantity }}%
+                                        </progress>
+                                    </p>
+                                {% else %}
+                                    <p style="margin: 0;"><strong>Food:</strong> <span class="has-text-weight-bold">No data</span></p>
+                                {% endif %}
+                            {% endwith %}
+                            {% with pet.water_logs.all|dictsortreversed:"created_at"|first as log %}
+                                {% if log %}
+                                    <p style="margin: 0;"><strong>Water:</strong> {{ log.quantity }}%</p>
+                                    <progress class="progress is-info" value="{{ log.quantity }}" max="100">
+                                        {{ log.quantity }}%
+                                    </progress>
+                                {% else %}
+                                    <p style="margin: 0;"><strong>Water:</strong> <span class="has-text-weight-bold">No data</span></p>
+                                {% endif %}
+                            {% endwith %}
+                            {% with pet.water_logs.all|dictsortreversed:"created_at"|first as log %}
+                                {% if log %}
+                                    <span class="tag is-light">
+                                        <i class="fas fa-clock" style="margin-right:5px;"></i>{{ log.created_at }}
+                                    </span>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <footer class="card-footer button">
+                        <a href="/dashboard/manage/food-water/{{ pet.id }}" class="card-footer-item">
+                            <i class="fas fa-cogs" style="margin-right:5px;"></i>Manage
+                        </a>
+                    </footer>
+                </div>
+            </div>
+
+            <!-- Pet Door Card with Additional Info -->
+            <div class="column is-one-third sortable-item" data-widget-id="pet-door">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            <i class="fas fa-door-closed" style="margin-right:5px;"></i> Pet Door
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            {% with pet.door_logs.all|dictsortreversed:"created_at"|first as log %}
+                                {% if log %}
+                                    <p>
+                                        <strong>Status:</strong>
+                                        <span class="tag {% if log.status == 'close' %}is-danger{% else %}is-success{% endif %} has-text-weight-bold">
+                                            {% if log.status == 'close' %}
+                                                <i class="fas fa-lock" style="margin-right:5px;"></i>
+                                            {% else %}
+                                                <i class="fas fa-lock-open" style="margin-right:5px;"></i>
+                                            {% endif %}
+                                            {{ log.status|capfirst }}
+                                        </span>
+                                    </p>
+                                    <p>
+                                        <strong>Door Mode:</strong>
+                                        <span class="tag {% if log.mode == 'manual' %}is-danger{% else %}is-success{% endif %} has-text-weight-bold">
+                                            {% if log.mode == 'manual' %}
+                                                <i class="fas fa-user" style="margin-right:5px;"></i>
+                                            {% else %}
+                                                <i class="fas fa-robot" style="margin-right:5px;"></i>
+                                            {% endif %}
+                                            {{ log.mode|capfirst }}
+                                        </span>
+                                    </p>
+                                    <p>
+                                        <strong>Last Activity:</strong>
+                                        <span class="tag is-light">
+                                            <i class="fas fa-clock" style="margin-right:5px;"></i>{{ log.created_at }}
+                                        </span>
+                                    </p>
+                                {% else %}
+                                    <p>No data</p>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <footer class="card-footer button">
+                        <a href="/dashboard/manage/door/{{ pet.id }}" class="card-footer-item">
+                            <i class="fas fa-cogs" style="margin-right:5px;"></i>Manage
+                        </a>
+                    </footer>
+                </div>
+            </div>
+
+            <!-- Location Card -->
+            <div class="column is-one-third sortable-item" data-widget-id="location">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            <i class="fas fa-map-marker-alt" style="margin-right:5px;"></i> Location
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            {% with pet.location_logs.all|dictsortreversed:"created_at"|first as log %}
+                                {% if log %}
+                                    <p><strong>Last Known Location:</strong></p>
+                                    <p>{{ log.text }}</p>
+                                    <p>
+                                        <span class="tag is-light">
+                                            <i class="fas fa-clock" style="margin-right:5px;"></i>{{ log.created_at }}
+                                        </span>
+                                    </p>
+                                {% else %}
+                                    <p>No data</p>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <footer class="card-footer button">
+                        <a href="/dashboard/manage/location/{{ pet.id }}" class="card-footer-item">
+                            <i class="fas fa-cogs" style="margin-right:5px;"></i>Manage
+                        </a>
+                    </footer>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/smoothness/jquery-ui.css">
+
+
+    <script>
+        function equalizeCardHeights(container) {
+            let maxHeight = 0;
+            container.find(".sortable-item .card").css("height", "auto");
+            container.find(".sortable-item .card").each(function () {
+                let cardHeight = $(this).outerHeight();
+                if (cardHeight > maxHeight) {
+                    maxHeight = cardHeight;
+                }
+            });
+            container.find(".sortable-item .card").css("height", maxHeight + "px");
+        }
+    </script>
+
+    <script>
+        // Global variable to store the currently selected pet id
+        let currentPetId = null;
+
+        // Helper: load saved order from localStorage and apply to container
+        function loadSavedOrder(petId, container) {
+            let key = "widgetOrder-" + petId;
+            let saved = localStorage.getItem(key);
+            if (saved && saved.trim() !== "") {
+                try {
+                    let orderArray = JSON.parse(saved);
+                    if (!Array.isArray(orderArray)) {
+                        console.warn("Saved order for pet id", petId, "is not an array. Ignoring.");
+                        return;
+                    }
+                    let widgetMap = {};
+                    container.children(".sortable-item").each(function () {
+                        let id = $(this).data("widget-id");
+                        widgetMap[id] = $(this);
+                    });
+                    orderArray.forEach(function (id) {
+                        if (widgetMap[id]) {
+                            container.append(widgetMap[id]);
+                        }
+                    });
+                    equalizeCardHeights(container);
+                } catch (e) {
+                    console.error("Error parsing saved order for pet id:", petId, e);
+                }
+            }
+        }
+
+        $(document).ready(function () {
+            // Handle dropdown item click with fadeIn callback
+            $("#pet-dropdown-container .dropdown-item").click(function (e) {
+                e.preventDefault();
+                $("#pet-dropdown-container .dropdown-item").removeClass("is-active");
+                $(this).addClass("is-active");
+                let selectedId = $(this).data("value");
+                let selectedDisplay = $(this).data("display");
+                currentPetId = selectedId;
+                $("#dropdown-button-text").text(selectedDisplay);
+                $("#selected-pet").text(selectedDisplay);
+                console.log("Selected pet:", selectedId, selectedDisplay);
+                $("[id^='widget-container-']").hide();
+                let container = $("#widget-container-" + selectedId);
+                container.fadeIn("fast", function () {
+                    equalizeCardHeights(container);
+                    // Load saved widget order for this pet if it exists
+                    loadSavedOrder(selectedId, container);
+                });
+                window.history.replaceState({}, document.title, window.location.pathname + "?pet_id=" + selectedId);
+            });
+
+            // Auto-select the first available pet if exists with fadeIn callback
+            let $dropdownItems = $("#pet-dropdown-container .dropdown-item");
+            if ($dropdownItems.length > 0) {
+                let firstId = $dropdownItems.first().data("value");
+                let firstDisplay = $dropdownItems.first().data("display");
+                $dropdownItems.removeClass("is-active");
+                $dropdownItems.first().addClass("is-active");
+                currentPetId = firstId;
+                $("#dropdown-button-text").text(firstDisplay);
+                $("#selected-pet").text(firstDisplay);
+                console.log("Selected pet:", firstId, firstDisplay);
+                $("[id^='widget-container-']").hide();
+                let container = $("#widget-container-" + firstId);
+                container.fadeIn("fast", function () {
+                    equalizeCardHeights(container);
+                    loadSavedOrder(firstId, container);
+                });
+                let urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has("pet_id")) {
+                    let petIdFromUrl = urlParams.get("pet_id");
+                    if (petIdFromUrl !== firstId) {
+                        let $petItem = $("#pet-dropdown-container .dropdown-item[data-value='" + petIdFromUrl + "']");
+                        if ($petItem.length) {
+                            $dropdownItems.removeClass("is-active");
+                            $petItem.addClass("is-active");
+                            let displayFromUrl = $petItem.data("display");
+                            currentPetId = petIdFromUrl;
+                            $("#dropdown-button-text").text(displayFromUrl);
+                            $("#selected-pet").text(displayFromUrl);
+                            console.log("Switched to pet from URL:", petIdFromUrl, displayFromUrl);
+                            $("[id^='widget-container-']").hide();
+                            let container = $("#widget-container-" + petIdFromUrl);
+                            container.fadeIn("fast", function () {
+                                equalizeCardHeights(container);
+                                loadSavedOrder(petIdFromUrl, container);
+                            });
+                        } else {
+                            window.history.replaceState({}, document.title, window.location.pathname + "?pet_id=" + firstId);
+                        }
+                    }
+                } else {
+                    window.history.replaceState({}, document.title, window.location.pathname + "?pet_id=" + firstId);
+                }
+            } else {
+                $("#selected-pet").text("None");
+                $("[id^='widget-container-']").hide();
+                $("#no-info-warning").show();
+            }
+
+            // Initialize sortable functionality for each pet's widget container
+            $("[id^='widget-container-']").each(function () {
+                $(this).sortable({
+                    items: ".sortable-item",
+                    handle: ".card-header",
+                    placeholder: "sortable-placeholder",
+                    forcePlaceholderSize: true,
+                    tolerance: "pointer",
+                    revert: 200,
+                    opacity: 0.8,
+                    helper: "clone",
+                    update: function (event, ui) {
+                        let newOrder = [];
+                        $(this).find(".sortable-item").each(function () {
+                            newOrder.push($(this).data("widget-id"));
+                        });
+                        onWidgetMoved(newOrder);
+                        equalizeCardHeights($(this)); // Recalculate heights after sorting.
+                    }
+                }).disableSelection();
+            });
+
+            // Initial equalization for each container.
+            $("[id^='widget-container-']").each(function () {
+                equalizeCardHeights($(this));
+            });
+
+            // Recalculate on window resize.
+            $(window).resize(function () {
+                $("[id^='widget-container-']").each(function () {
+                    equalizeCardHeights($(this));
+                });
+            });
+        });
+
+        // Callback function when a widget is moved.
+        function onWidgetMoved(newOrder) {
+            console.log("New widget order:", newOrder);
+            if (currentPetId) {
+                localStorage.setItem("widgetOrder-" + currentPetId, JSON.stringify(newOrder));
+            }
+        }
+
+        // Helper function to reorder widgets programmatically.
+        function reorderWidgets(orderArray) {
+            let container = $("#widget-container");
+            let widgetMap = {};
+            container.children(".sortable-item").each(function () {
+                let id = $(this).data("widget-id");
+                widgetMap[id] = $(this);
+            });
+            orderArray.forEach(function (id) {
+                if (widgetMap[id]) {
+                    container.append(widgetMap[id]);
+                }
+            });
+            onWidgetMoved(orderArray);
+            equalizeCardHeights(container);
+        }
+    </script>
 {% endblock %}

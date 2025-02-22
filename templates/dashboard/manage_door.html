@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Door{% endblock %}
+
+{% block content %}
+    <div class="section">
+        <div class="container">
+            <h1 class="title has-text-centered">Manage Door Settings for {{ pet.name }} <br><br><a class="button is-warning" href="/dashboard/?pet_id={{ pet.id }}">Back to Dashboard</a></h1>
+
+            <form id="manage-door-form">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">Door Settings</p>
+                            </header>
+                            <div class="card-content">
+                                <!-- Door Mode Dropdown -->
+                                <div class="field">
+                                    <label class="label">Door Mode</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select id="door_mode" name="door_mode">
+                                                <option value="manual" {% if pet.door_mode == 'manual' %}selected{% endif %}>Manual</option>
+                                                <option value="automatic" {% if pet.door_mode == 'automatic' %}selected{% endif %}>Automatic</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Automatic Options (shown only if door_mode is automatic) -->
+                                <div id="door_automatic_options" style="display: none;">
+                                    <div class="field">
+                                        <div class="control">
+                                            <label class="checkbox">
+                                                <input type="checkbox" id="always_open" name="always_open" {% if pet.always_open %}checked{% endif %}>
+                                                Always Open
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <!-- Time Options: shown only if "Always Open" is not checked -->
+                                    <div id="door_time_options" style="display: none;">
+                                        <div class="field">
+                                            <label class="label">Door Open Time</label>
+                                            <div class="control">
+                                                <input class="input" type="time" id="door_open_time" name="door_open_time" value="{{ pet.door_open_time|time:'H:i'|default_if_none:'08:00' }}">
+                                            </div>
+                                        </div>
+                                        <div class="field">
+                                            <label class="label">Door Close Time</label>
+                                            <div class="control">
+                                                <input class="input" type="time" id="door_close_time" name="door_close_time" value="{{ pet.door_close_time|time:'H:i'|default_if_none:'20:00' }}">
+                                            </div>
+                                        </div>
+                                        <div class="field">
+                                            <div class="control">
+                                                <label class="checkbox">
+                                                    <input type="checkbox" id="allow_in_after_closing" name="allow_in_after_closing" {% if pet.allow_in_after_closing %}checked{% endif %}>
+                                                    Allow pet inside after closing?
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Manual Options: shown only if door_mode is manual -->
+                                <div id="door_manual_options" style="display: none;">
+                                    <div class="columns">
+                                        <div class="column">
+                                            <button type="button" id="open-door-button" class="button is-info is-fullwidth">Open Door</button>
+                                        </div>
+                                        <div class="column">
+                                            <button type="button" id="close-door-button" class="button is-danger is-fullwidth">Close Door</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- In-house Checkbox (always shown) -->
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Save Button -->
+                <div class="field">
+                    <div class="control">
+                        <button id="save-door-settings" type="button" class="button is-primary is-fullwidth">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Functions to update door options display based on mode and checkbox.
+        function updateDoorOptions() {
+            let mode = document.getElementById('door_mode').value;
+            if (mode === 'automatic') {
+                document.getElementById('door_automatic_options').style.display = 'block';
+                document.getElementById('door_manual_options').style.display = 'none';
+                updateDoorAutomaticOptions();
+            } else if (mode === 'manual') {
+                document.getElementById('door_automatic_options').style.display = 'none';
+                document.getElementById('door_manual_options').style.display = 'block';
+            } else {
+                document.getElementById('door_automatic_options').style.display = 'none';
+                document.getElementById('door_manual_options').style.display = 'none';
+            }
+        }
+        function updateDoorAutomaticOptions() {
+            let alwaysOpen = document.getElementById('always_open').checked;
+            if (alwaysOpen) {
+                document.getElementById('door_time_options').style.display = 'none';
+            } else {
+                document.getElementById('door_time_options').style.display = 'block';
+            }
+        }
+
+        // Attach change events for door mode and always open checkbox.
+        document.getElementById('door_mode').addEventListener('change', updateDoorOptions);
+        document.getElementById('always_open').addEventListener('change', updateDoorAutomaticOptions);
+
+        // Initialize door options display on load.
+        updateDoorOptions();
+
+        // Manual door action: "Open Door" button handler.
+        document.getElementById('open-door-button').addEventListener('click', function() {
+            console.log("Manual Open triggered for pet: {{ pet.id }}");
+            $.post("/dashboard/manage/door/manual/{{ pet.id }}/", {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                status: 'open',
+                mode: 'manual'
+            }, function(response) {
+                console.log("Door Open response:", response);
+                window.location.reload();
+            });
+        });
+
+        // Manual door action: "Close Door" button handler.
+        document.getElementById('close-door-button').addEventListener('click', function() {
+            console.log("Manual Close triggered for pet: {{ pet.id }}");
+            $.post("/dashboard/manage/door/manual/{{ pet.id }}/", {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                status: 'close',
+                mode: 'manual'
+            }, function(response) {
+                console.log("Door Close response:", response);
+                window.location.reload();
+            });
+        });
+
+        // Save button handler: gather all form values and send them via AJAX.
+        document.getElementById('save-door-settings').addEventListener('click', function() {
+            let data = {
+                door_mode: document.getElementById('door_mode').value,
+                always_open: document.getElementById('always_open').checked,
+                door_open_time: document.getElementById('door_open_time').value,
+                door_close_time: document.getElementById('door_close_time').value,
+                allow_in_after_closing: document.getElementById('allow_in_after_closing').checked,
+            };
+            console.log("Saved door settings:", data);
+            $.post(window.location.pathname, {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                door_mode: data.door_mode,
+                always_open: data.always_open,
+                door_open_time: data.door_open_time,
+                door_close_time: data.door_close_time,
+                allow_in_after_closing: data.allow_in_after_closing
+            }, function(response) {
+                console.log("Server response:", response);
+                window.location.reload();
+            });
+        });
+    </script>
+{% endblock %}

@@ -5,9 +5,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>HomePet Navbar</title>
+    <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         @import url('https://fonts.cdnfonts.com/css/samsung-sans-4');
 
@@ -21,8 +28,13 @@
 
         /* Navbar enhancements */
         .navbar {
+            display: flex;
+            position: fixed;
+            top: 0;
+            width: 100%;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
+            transition: 0.3s ease;
+            background-color: white;
         }
         .navbar-item:hover {
             background-color: rgba(255, 255, 255, 0.1);
@@ -37,24 +49,29 @@
         .navbar-dropdown {
             min-width: 180px;
         }
-        .navbar {
-            background-color: var(--celadon);
-        }
 
         body {
             background-color: var(--vanilla);
         }
+        #map {
+            width: 500px;
+            height: 400px;
+            margin: 20px auto;
+            border: 1px solid var(--ebony);
+            background: none;
+        }
     </style>
 </head>
 <body>
-<nav class="navbar" role="navigation" aria-label="main navigation">
+<div style="margin-top: 32px"></div>
+<nav class="navbar" role="navigation" aria-label="main navigation" id="navbar">
     <div class="navbar-brand">
         <!-- Home Button -->
         <a class="navbar-item" href="/">
             <span class="icon"><i class="fas fa-home"></i></span>
             <span>Home</span>
         </a>
-        <a class="navbar-item" href="/">
+        <a class="navbar-item" href="/dashboard/">
             <span class="icon"><i class="fa-solid fa-gauge"></i></span>
             <span>Dashboard</span>
         </a>
@@ -73,19 +90,16 @@
             <!-- Profile Dropdown -->
             <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link">
-                    <figure class="image is-32x32" style="margin-right: 8px;">
-                        <!-- Replace with your actual profile image -->
-                        <img class="is-rounded" src="https://via.placeholder.com/32" alt="Profile">
-                    </figure>
+                    <img style="border-radius: 15px;" class="is-rounded" onerror="this.src='/static/image/blank-profile.webp'" src="/static/image/pfp/{{ request.user.id }}.jpeg" alt="Profile">
                     <span>Account</span>
                 </a>
                 <div class="navbar-dropdown is-right">
-                    <a class="navbar-item" href="/profile">
+                    <a class="navbar-item button" href="/profile">
                         <span class="icon"><i class="fas fa-user"></i></span>
                         <span>Profile</span>
                     </a>
                     <hr class="navbar-divider">
-                    <a class="navbar-item" href="/logout">
+                    <a class="navbar-item button is-danger" href="/accounts/logout/">
                         <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
                         <span>Logout</span>
                     </a>
@@ -94,12 +108,70 @@
         </div>
     </div>
 </nav>
+<script>
+    var prevScrollpos = window.scrollY;
+    window.onscroll = function () {
+        var currentScrollPos = window.scrollY;
+        if (prevScrollpos > currentScrollPos) {
+            document.getElementById("navbar").style.top = "0";
+        } else {
+            document.getElementById("navbar").style.top = "-10rem";
+        }
+        prevScrollpos = currentScrollPos;
+    }
+</script>
+<br>
+<div class="container">
+{% if messages %}
+    {% for message in messages %}
 
+        {% if message.tags == 'error' %}
+            <article class="message is-danger">
+                <div class="message-header">
+                    <p>Error</p>
+                    <button class="delete" aria-label="delete"
+                            onclick="this.parentElement.parentElement.remove();"></button>
+                </div>
+                <div class="message-body">
+                    {{ message }}
+                </div>
+            </article>
+        {% elif message.tags == "success" %}
+            <article class="message is-success">
+                <div class="message-header">
+                    <p>Success</p>
+                    <button class="delete" aria-label="delete"
+                            onclick="this.parentElement.parentElement.remove();"></button>
+                </div>
+                <div class="message-body">
+                    {{ message }}
+                </div>
+            </article>
+        {% elif message.tags == "warning" %}
+            <article class="message is-warning">
+                <div class="message-header">
+                    <p>Warning</p>
+                    <button class="delete" aria-label="delete"
+                            onclick="this.parentElement.parentElement.remove();"></button>
+                </div>
+                <div class="message-body">
+                    {{ message }}
+                </div>
+            </article>
+        {% endif %}
+    {% endfor %}
+
+{% endif %}
+</div>
 <!-- Page content -->
-<div class="container" style="margin-top: 20px;">
+{# full height #}
+<div class="container" style="margin-top: 20px; min-height: 100vh;">
     {% block content %}
     {% endblock %}
 </div>
+
+
+{% include "footer.html" %}
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {

@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Pet</title>
 
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -16,16 +15,217 @@
 
         :root {
             --pistachio: #8ed081;
-            --celadon: #B4D2BA;
+            --celadon: #b4d2ba;
             --vanilla: #dce2aa;
-            --copper: #B57F50;
+            --copper: #b57f50;
             --ebony: #4B543B;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
+        #navbar {
+            display: flex;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 10px 20px;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 4;
+            transition: top .7s;
+        }
+
+        #navbar .logo img {
+            height: 32px;
+        }
+
+        #navbar .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        #navbar .nav-links a {
+            color: var(--celadon);
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 5px 10px;
+            transition: 0.3s;
+        }
+
+        #navbar .nav-links a:hover {
+            color: var(--pistachio);
+        }
+
+        .mainContainer {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+        }
+
+        .mainContainer video {
+            width: 100%;
+            height: 100vh;
+            object-fit: cover;
+            filter: blur(10px);
+        }
+
+        .mainContainer .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            z-index: 2;
+        }
+
+        .mainContainer .content {
+            position: absolute;
+            z-index: 3;
+            background-color: rgba(220, 226, 170, 0.8);
+            border-radius: 360px;
+            padding: 60px;
+            width: 500px;
+            height: 500px;
+            margin: 0 auto;
+            align-items: center;
+            box-shadow: 2px 5px 20px 3px var(--vanilla);
+        }
+
+        .mainContainer .content p {
+            font-size: 1.25rem;
+            font-family: 'Samsung Sans', sans-serif;
+            color: var(--ebony);
+            line-height: 1.6;
+        }
+
+        .is-home-info {
+            background-color: var(--pistachio);
+            border-color: var(--pistachio);
+            box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.15);
+            color: white;
+        }
+
+        .button.is-home-info:hover {
+            background-color: #6aaa63;
+            border-color: #6aaa63;
+        }
+
+        .is-card-button {
+            background-color: var(--copper);
+            border-color: var(--copper);
+            color: white;
+        }
+
+        .is-card-button:hover {
+            background-color: #835c34;
+            border-color: #835c34;
+        }
+
+        .info-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 50px;
+            max-width: 1200px;
+            margin: 50px auto;
+            background-color: var(--ebony);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .info-text {
+            flex: 1;
+            text-align: left;
+            padding-right: 20px;
+        }
+
+        .info-text h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .info-text p {
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+
+        .info-image {
+            flex: 1;
+            text-align: right;
+        }
+
+        .info-image img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1 style="color: var(--copper)">Text</h1>
+    <div id="navbar">
+        <div class="logo"><img src="{% static "image/logo-white.png" %}" alt="HomePet Logo"></div>
+        <div class="nav-links">
+            {% if request.user.is_authenticated %}
+                <a class="button" href="/dashboard/" style="color: black"><i class="fa-solid fa-chart-simple" style="margin-right: 8px"></i>Dashboard</a>
+            {% else %}
+                <a class="button is-outlined" href="/accounts/login/" style="text-decoration: none; color: white;">Login</a>
+                <a class="button" style="text-decoration: none; color: black;"><i class="fa-solid fa-right-to-bracket" style="margin-right: 8px"></i>Sign Up</a>
+            {% endif %}
 
+        </div>
+    </div>
+
+    <div class="mainContainer">
+        <video autoplay muted loop id="myVideo">
+            <source src="{% static "video/home_screen_1.mp4" %}" type="video/mp4">
+        </video>
+        <div class="overlay"></div>
+        <div class="content">
+            <img src="{% static "image/logo-green-nobg.png" %}" alt="HomePet Logo" style="margin-top: 25%; margin-left: 2%" />
+            <p>Welcome to HomePet, where your pets feel at home. Discover great services, products, and care for your furry friends!</p>
+            <a class="button is-home-info" href="#info_cards" style="text-decoration: none; color: white; border-radius: 100px;"><i class="fa-solid fa-arrow-down" style="margin-right: 8px;"></i>Read more!</a>
+        </div>
+    </div>
+
+    <div class="info-container" id="info_cards">
+        <div class="info-text">
+            <h2 style="font-weight: bold"><i class="fa-solid fa-shield-dog" style="margin-right: 8px"></i>What is HomePet?</h2>
+            <p>An intelligent and secure monitoring system for pet infrastructure.</p>
+        </div>
+        <div class="info-image">
+        </div>
+    </div>
+
+    <div class="info-container">
+        <div class="info-text">
+            <h2 style="font-weight: bold"><i class="fa-solid fa-square-poll-vertical" style="margin-right: 8px"></i>Monitoring Dashboard</h2>
+            <p>A dashboard that consolidates live information about your pet’s condition.</p>
+            <a class="button is-home-info" style="margin-top: 12px" href="/dashboard/"><i class="fa-solid fa-chart-simple" style="margin-right: 8px"></i>Dashboard</a>
+        </div>
+        <div class="info-image">
+        </div>
+    </div>
+
+    {% include "footer.html" %}
+
+    <script>
+        var prevScrollpos = window.scrollY;
+        window.onscroll = function () {
+        var currentScrollPos = window.scrollY;
+        if (prevScrollpos > currentScrollPos) {
+            document.getElementById("navbar").style.top = "0";
+        } else {
+            document.getElementById("navbar").style.top = "-10rem";
+        }
+            prevScrollpos = currentScrollPos;
+        }
+    </script>
 </body>
 </html>

@@ -6,9 +6,9 @@ SECRET_KEY = 'django-insecure-&!a1(wsuis9ov&k7sq(b80o@wwy%3y%i@)9$%64p@^3(a5%k)u
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["homepet.serveo.net", "127.0.0.1"]
-CSRF_TRUSTED_ORIGINS = ["https://homepet.serveo.net/"]
-CORS_ALLOWED_ORIGINS = ["https://homepet.serveo.net/"]
+ALLOWED_HOSTS = ["dev-homepet.deyannikolov.eu", "127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = ["https://dev-homepet.deyannikolov.eu"]
+CORS_ALLOWED_ORIGINS = ["https://dev-homepet.deyannikolov.eu"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',

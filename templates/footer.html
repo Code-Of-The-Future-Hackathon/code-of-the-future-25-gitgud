@@ -1,0 +1,32 @@
+{% load static %}
+
+<footer class="footer" style="background-color: var(--ebony); color: white; padding: 2rem 1.5rem;">
+    <div class="content has-text-centered">
+        <figure class="image is-inline-block" style="margin-bottom: 10px;">
+            <img src="{% static 'image/logo-white.png' %}" alt="HomePet Logo" style="max-height: 35px;">
+        </figure>
+        <p>
+            <strong style="color: white">HomePet</strong>. All rights reserved, 2025<br>
+            <span style="font-size: 12px"> Deyan Nikolov, Dimitar Mitev & Lyubo Arnaudov - Team GitGud</span>
+        </p>
+        <p style="font-size: 10px;">
+            This project and all associated materials, including but not limited to names, branding, and concepts, are purely fictional and created solely for the Hackathon "Code of the Future."
+            <br>Any resemblance to actual persons, living or deceased, entities, organizations, or events, past or present, is purely coincidental and does not imply any affiliation, endorsement, or association.
+            <br>This project is not intended for commercial use and does not represent a real legal entity. No warranties, express or implied, are made regarding the accuracy, completeness, or reliability of any content herein.
+        </p>
+        <p style="font-size: 10px; color: #dfdfdf;">
+            All data in this project is manually populated and not sourced from real-time systems or live feeds. It is purely synthetic and used for demonstration purposes only.
+        </p>
+        <p style="font-size: 10px; color: #b8b8b8;">
+            {% now "l, F jS, Y - P" %}
+        </p>
+
+
+        <p>
+            <a href="#" style="color: white;"><span class="icon is-medium"><i class="fab fa-facebook"></i></span></a>
+            <a href="#" style="color: white;"><span class="icon is-medium"><i class="fab fa-twitter"></i></span></a>
+            <a href="#" style="color: white;"><span class="icon is-medium"><i class="fab fa-instagram"></i></span></a>
+            <a href="#" style="color: white;"><span class="icon is-medium"><i class="fab fa-linkedin"></i></span></a>
+        </p>
+    </div>
+</footer>

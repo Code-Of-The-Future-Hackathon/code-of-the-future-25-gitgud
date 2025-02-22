@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Location{% endblock %}
+
+{% block content %}
+    <div class="section">
+        <div class="container">
+            <h1 class="title has-text-centered">Manage Location for {{ pet.name }} <br><br><a class="button is-warning" href="/dashboard/?pet_id={{ pet.id }}">Back to Dashboard</a></h1>
+            {% with pet.location_logs.all|dictsortreversed:"created_at"|first as log %}
+                {% if log %}
+                    <div class="card" style="margin-bottom: 20px;">
+                        <header class="card-header">
+                            <p class="card-header-title">Last Known Location</p>
+                        </header>
+                        <div class="card-content">
+                            <div class="content">
+                                <p><strong>Description:</strong> {{ log.text }}</p>
+                                <p><strong>Updated:</strong> {{ log.created_at }}</p>
+                                <p><strong>Coordinates:</strong> ({{ log.latitude }}, {{ log.longitude }})</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="map" style="width: 100%; height: 400px; margin-bottom: 20px;"></div>
+                {% else %}
+                    <div class="notification is-warning">
+                        No location data available.
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% with pet.location_logs.all|dictsortreversed:"created_at"|first as log %}
+                {% if log %}
+                    // Initialize map with Simple CRS and custom bounds.
+                    // Load image to get its dimensions dynamically
+                    var img = new Image();
+                    img.src = '/static/image/test.png';
+                    img.onload = function () {
+                        var imgWidth = img.naturalWidth, imgHeight = img.naturalHeight;
+                        var bounds = [[0, 0], [imgHeight, imgWidth]];
+
+                        // Get map container size
+                        var container = document.getElementById('map');
+                        var containerWidth = container.clientWidth, containerHeight = container.clientHeight;
+
+                        // Calculate minimum zoom to fit image in viewport
+                        var minZoom = Math.log2(Math.min(containerWidth / imgWidth, containerHeight / imgHeight));
+
+                        // Initialize Leaflet map
+                        var map = L.map('map', {
+                            crs: L.CRS.Simple,
+                            minZoom: minZoom,  // Prevent zooming out beyond image fit
+                            maxZoom: 2,
+                            zoom: 0,
+                            maxBounds: bounds,  // Prevent panning outside the image
+                            maxBoundsViscosity: 1.0,  // Strong boundary effect
+                            zoomControl: true,
+                            scrollWheelZoom: true  // Disable scroll wheel zoom by default
+                        });
+
+                        // Add image overlay
+                        L.imageOverlay(img.src, bounds).addTo(map);
+                        map.fitBounds(bounds);
+
+                        // Add marker for "Last known location"
+                        L.marker([{{ log.latitude }}, {{ log.longitude }}]).addTo(map)
+                            .bindPopup('<strong>{{ pet.name }}</strong><br>{{ log.text }}')
+                            .openPopup();
+                    };
+
+                {% endif %}
+            {% endwith %}
+        });
+    </script>
+{% endblock %}

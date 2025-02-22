@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Food &amp; Water{% endblock %}
+<style>
+    #datacol .column {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 !important;
+    }
+</style>
+
+{% block content %}
+    <div class="section">
+        <div class="container">
+            <h1 class="title has-text-centered">
+                Manage Food &amp; Water Settings for {{ pet.name }}<br><br>
+                <a class="button is-warning" href="/dashboard/?pet_id={{ pet.id }}">Back to Dashboard</a>
+            </h1>
+            <form id="manage-settings-form">
+                <div class="columns is-multiline">
+                    <div class="column is-full">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">Feeder Data</p>
+                            </header>
+                            <div class="columns is-multiline is-centered" id="datacol">
+                                <div class="column is-half">
+                <span class="tag is-light" style="width: 100%; height: 100% !important;">
+                  <i class="fas fa-clock" style="margin-right:5px;"></i>dwa
+                </span>
+                                </div>
+                                <div class="column is-half">
+                <span class="tag is-light" style="width: 100%; height: 100% !important;">
+                  <i class="fas fa-clock" style="margin-right:5px;"></i>dwa
+                </span>
+                                </div>
+                                <div class="column is-half">
+                <span class="tag is-light" style="width: 100%; height: 100% !important;">
+                  <i class="fas fa-clock" style="margin-right:5px;"></i>dwa
+                </span>
+                                </div>
+                                <div class="column is-half">
+                <span class="tag is-light" style="width: 100%; height: 100% !important;">
+                  <i class="fas fa-clock" style="margin-right:5px;"></i>dwa
+                </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column is-half">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">Food Settings</p>
+                            </header>
+                            <div class="card-content">
+                                <!-- Food Mode Dropdown -->
+                                <div class="field">
+                                    <label class="label">Mode</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select id="food_mode" name="food_mode">
+                                                <option value="automatic" {% if pet.food_mode == 'automatic' %}selected{% endif %}>Automatic</option>
+                                                <option value="manual" {% if pet.food_mode == 'manual' %}selected{% endif %}>Manual</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Automatic Options for Food -->
+                                <div id="food_automatic_options" style="display: none;">
+                                    <div class="field">
+                                        <label class="label">Automatic Mode</label>
+                                        <div class="control">
+                                            <div class="select is-fullwidth">
+                                                <select id="automatic_food_mode" name="automatic_food_mode">
+                                                    <option value="timed" {% if pet.automatic_food_mode == 'timed' %}selected{% endif %}>Timed</option>
+                                                    <option value="interval" {% if pet.automatic_food_mode == 'interval' %}selected{% endif %}>Interval</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field" id="food_timed_option" style="display: none;">
+                                        <label class="label">Feed Time</label>
+                                        <div class="control">
+                                            <input class="input" type="time" id="automatic_food_time" name="automatic_food_time" value="{{ pet.automatic_food_time|time:'H:i'|default_if_none:'12:00' }}">
+                                        </div>
+                                    </div>
+                                    <div class="field" id="food_interval_option" style="display: none;">
+                                        <label class="label">Feed Interval (minutes)</label>
+                                        <div class="control">
+                                            <input class="input" type="number" id="automatic_food_interval" name="automatic_food_interval" placeholder="Enter interval in minutes" value="{{ pet.automatic_food_interval }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Food Quantity -->
+                                <div class="field">
+                                    <label class="label">Food Quantity (grams)</label>
+                                    <div class="control">
+                                        <input class="input" type="number" id="automatic_food_quantity" name="automatic_food_quantity" placeholder="Enter food quantity" value="{{ pet.automatic_food_quantity }}">
+                                    </div>
+                                </div>
+                                <div id="food_manual_options" style="display: none;">
+                                    <div class="field">
+                                        <div class="control">
+                                            <button id="feed-button" type="button" class="button is-warning is-fullwidth">Feed</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column is-half">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">Water Settings</p>
+                            </header>
+                            <div class="card-content">
+                                <!-- Water Mode Dropdown -->
+                                <div class="field">
+                                    <label class="label">Mode</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select id="water_mode" name="water_mode">
+                                                <option value="automatic" {% if pet.water_mode == 'automatic' %}selected{% endif %}>Automatic</option>
+                                                <option value="manual" {% if pet.water_mode == 'manual' %}selected{% endif %}>Manual</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Automatic Options for Water -->
+                                <div id="water_automatic_options" style="display: none;">
+                                    <div class="field">
+                                        <label class="label">Automatic Mode</label>
+                                        <div class="control">
+                                            <div class="select is-fullwidth">
+                                                <select id="automatic_water_mode" name="automatic_water_mode">
+                                                    <option value="timed" {% if pet.automatic_water_mode == 'timed' %}selected{% endif %}>Timed</option>
+                                                    <option value="interval" {% if pet.automatic_water_mode == 'interval' %}selected{% endif %}>Interval</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field" id="water_timed_option" style="display: none;">
+                                        <label class="label">Water Time</label>
+                                        <div class="control">
+                                            <input class="input" type="time" id="automatic_water_time" name="automatic_water_time" value="{{ pet.automatic_water_time|time:'H:i'|default_if_none:'12:00' }}">
+                                        </div>
+                                    </div>
+                                    <div class="field" id="water_interval_option" style="display: none;">
+                                        <label class="label">Water Interval (minutes)</label>
+                                        <div class="control">
+                                            <input class="input" type="number" id="automatic_water_interval" name="automatic_water_interval" placeholder="Enter interval in minutes" value="{{ pet.automatic_water_interval }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Water Quantity -->
+                                <div class="field">
+                                    <label class="label">Water Quantity (ml)</label>
+                                    <div class="control">
+                                        <input class="input" type="number" id="automatic_water_quantity" name="automatic_water_quantity" placeholder="Enter water quantity" value="{{ pet.automatic_water_quantity }}">
+                                    </div>
+                                </div>
+                                <div id="water_manual_options" style="display: none;">
+                                    <div class="field">
+                                        <div class="control">
+                                            <button id="water-button" type="button" class="button is-info is-fullwidth">Water</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Save Button -->
+                <div class="field">
+                    <div class="control">
+                        <button id="save-settings" type="button" class="button is-primary is-fullwidth">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Functions to update Food automatic/manual options display
+        function updateFoodOptions() {
+            let mode = document.getElementById('food_mode').value;
+            if (mode === 'automatic') {
+                document.getElementById('food_automatic_options').style.display = 'block';
+                document.getElementById('food_manual_options').style.display = 'none';
+                updateFoodAutomaticOptions();
+            } else if (mode === 'manual') {
+                document.getElementById('food_automatic_options').style.display = 'none';
+                document.getElementById('food_manual_options').style.display = 'block';
+            } else {
+                document.getElementById('food_automatic_options').style.display = 'none';
+                document.getElementById('food_manual_options').style.display = 'none';
+            }
+        }
+        function updateFoodAutomaticOptions() {
+            let autoMode = document.getElementById('automatic_food_mode').value;
+            if (autoMode === 'timed') {
+                document.getElementById('food_timed_option').style.display = 'block';
+                document.getElementById('food_interval_option').style.display = 'none';
+            } else if (autoMode === 'interval') {
+                document.getElementById('food_timed_option').style.display = 'none';
+                document.getElementById('food_interval_option').style.display = 'block';
+            }
+        }
+
+        // Functions to update Water automatic/manual options display
+        function updateWaterOptions() {
+            let mode = document.getElementById('water_mode').value;
+            if (mode === 'automatic') {
+                document.getElementById('water_automatic_options').style.display = 'block';
+                document.getElementById('water_manual_options').style.display = 'none';
+                updateWaterAutomaticOptions();
+            } else if (mode === 'manual') {
+                document.getElementById('water_automatic_options').style.display = 'none';
+                document.getElementById('water_manual_options').style.display = 'block';
+            } else {
+                document.getElementById('water_automatic_options').style.display = 'none';
+                document.getElementById('water_manual_options').style.display = 'none';
+            }
+        }
+        function updateWaterAutomaticOptions() {
+            let autoMode = document.getElementById('automatic_water_mode').value;
+            if (autoMode === 'timed') {
+                document.getElementById('water_timed_option').style.display = 'block';
+                document.getElementById('water_interval_option').style.display = 'none';
+            } else if (autoMode === 'interval') {
+                document.getElementById('water_timed_option').style.display = 'none';
+                document.getElementById('water_interval_option').style.display = 'block';
+            }
+        }
+
+        // Attach change events
+        document.getElementById('food_mode').addEventListener('change', updateFoodOptions);
+        document.getElementById('automatic_food_mode').addEventListener('change', updateFoodAutomaticOptions);
+        document.getElementById('water_mode').addEventListener('change', updateWaterOptions);
+        document.getElementById('automatic_water_mode').addEventListener('change', updateWaterAutomaticOptions);
+
+        // Initialize options display on load
+        updateFoodOptions();
+        updateWaterOptions();
+
+        // Attach manual button events (for now, simply log)
+        document.getElementById('feed-button').addEventListener('click', function() {
+            console.log("Manual Feed action triggered for pet: {{ pet.id }}");
+            // Add manual feeding functionality here.
+        });
+        document.getElementById('water-button').addEventListener('click', function() {
+            console.log("Manual Water action triggered for pet: {{ pet.id }}");
+            // Add manual water dispensing functionality here.
+        });
+
+        // Save button handler: gather all form values, post them, then reload the page.
+        document.getElementById('save-settings').addEventListener('click', function() {
+            let data = {
+                food_mode: document.getElementById('food_mode').value,
+                automatic_food_mode: document.getElementById('automatic_food_mode').value,
+                automatic_food_time: document.getElementById('automatic_food_time').value,
+                automatic_food_interval: document.getElementById('automatic_food_interval').value,
+                automatic_food_quantity: document.getElementById('automatic_food_quantity').value,
+                water_mode: document.getElementById('water_mode').value,
+                automatic_water_mode: document.getElementById('automatic_water_mode').value,
+                automatic_water_time: document.getElementById('automatic_water_time').value,
+                automatic_water_interval: document.getElementById('automatic_water_interval').value,
+                automatic_water_quantity: document.getElementById('automatic_water_quantity').value,
+            };
+            console.log("Saved settings:", data);
+            $.post(window.location.pathname, {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                food_mode: data.food_mode,
+                automatic_food_mode: data.automatic_food_mode,
+                automatic_food_time: data.automatic_food_time,
+                automatic_food_interval: data.automatic_food_interval,
+                automatic_food_quantity: data.automatic_food_quantity,
+                water_mode: data.water_mode,
+                automatic_water_mode: data.automatic_water_mode,
+                automatic_water_time: data.automatic_water_time,
+                automatic_water_interval: data.automatic_water_interval,
+                automatic_water_quantity: data.automatic_water_quantity
+            }, function(response) {
+                console.log("Server response:", response);
+                window.location.reload();
+            });
+        });
+    </script>
+{% endblock %}
