@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <section class="hero is-fullheight" style="background: url('{% static "image/add-pet-bg.jpg" %}') no-repeat center center; background-size: cover;">
+        <div class="hero-body">
+            <div class="container">
+                <div class="columns is-centered">
+                    <div class="column is-4-desktop is-6-tablet">
+                        <div class="box" style="box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                            <h1 class="title has-text-centered">Register Your Pet</h1>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <!-- Pet Name -->
+                                <div class="field">
+                                    <label class="label"><i class="fa-solid fa-paw m-icon"></i>Name</label>
+                                    <div class="control">
+                                        <input class="input" type="text" name="name" placeholder="Enter pet's name" required>
+                                    </div>
+                                </div>
+                                <!-- Pet Type Dropdown -->
+                                <div class="field">
+                                    <label class="label">Type</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select name="type" required>
+                                                <option value="">Select type</option>
+                                                <option value="dog">Dog</option>
+                                                <option value="cat">Cat</option>
+                                                <option value="bird">Bird</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Exact Birthday Checkbox -->
+                                <div class="field">
+                                    <label class="checkbox">
+                                        <input type="checkbox" id="exactBirthday" name="exact_birthday" onchange="toggleBirthdayFields()">
+                                        Exact Birthday?
+                                    </label>
+                                </div>
+                                <!-- Birthday Date Field -->
+                                <div class="field" id="birthdayField" style="display: none;">
+                                    <label class="label">Birthday</label>
+                                    <div class="control">
+                                        <input class="input" type="date" name="birthday">
+                                    </div>
+                                </div>
+                                <!-- Age Field -->
+                                <div class="field" id="ageField">
+                                    <label class="label">Age (in years)</label>
+                                    <div class="control">
+                                        <input class="input" type="number" name="age" min="0" placeholder="Enter pet's age">
+                                    </div>
+                                </div>
+                                <!-- Submit Button -->
+                                <div class="field">
+                                    <div class="control">
+                                        <button class="button is-link is-fullwidth" type="submit">Add Pet</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function toggleBirthdayFields() {
+            var checkbox = document.getElementById('exactBirthday');
+            var birthdayField = document.getElementById('birthdayField');
+            var ageField = document.getElementById('ageField');
+            if (checkbox.checked) {
+                birthdayField.style.display = 'block';
+                ageField.style.display = 'none';
+            } else {
+                birthdayField.style.display = 'none';
+                ageField.style.display = 'block';
+            }
+        }
+    </script>
+{% endblock %}

@@ -73,48 +73,45 @@
     </style>
 
     <!-- Dropdown Selection Section using Bulma's dropdown -->
-    <div class="columns dropdown-section">
-{#        <div class="column">#}
-{#            <h2 class="title is-4">#}
-{#                Selected Pet: <span id="selected-pet">None</span>#}
-{#            </h2>#}
-        <div class="column">
-            <h2 class="title is-4">
-                Selected Pet:
-            </h2>
-        </div>
-        <div class="column is-narrow">
-            <div class="dropdown is-hoverable" id="pet-dropdown-container">
-                <div class="dropdown-trigger">
-                    <button class="button is-rounded" aria-haspopup="true" aria-controls="dropdown-menu">
-                        <span id="dropdown-button-text">Select a Pet</span>
-                        <span class="icon is-small">
-                            <i class="fas fa-angle-down" aria-hidden="true"></i>
-                        </span>
-                    </button>
-                </div>
-                <div class="dropdown-menu" id="dropdown-menu" role="menu" style="min-width: auto !important;">
-                    <div class="dropdown-content">
-                        {% if owner_pets %}
-                            {% for pet in owner_pets %}
-                                <a href="#" class="dropdown-item" data-value="{{ pet.id }}" data-display="{{ pet.name }}">
-                                    {% if pet.type|lower == "dog" %}
-                                    <i class="fas fa-dog" style="margin-right:5px;"></i>
-                                    {% elif pet.type|lower == "cat" %}
-                                    <i class="fas fa-cat " style="margin-right:5px;"></i>
-                                    {% elif pet.type|lower == "fish" %}
-                                    <i class="fas fa-fish" style="margin-right:5px;"></i>
-                                    {% else %}
-                                    <i class="fas fa-paw " style="margin-right:5px;"></i>
-                                    {% endif %}
+    <div class="columns dropdown-section" style="margin-top: 18px">
+        <h2 class="title is-4" style="margin-right: 10px; margin-left: 20px;">
+            Selected Pet:
+        </h2>
+        <div class="dropdown is-hoverable" id="pet-dropdown-container">
+            <div class="dropdown-trigger"  style="margin-top: -3px">
+                <button class="button is-rounded" aria-haspopup="true" aria-controls="dropdown-menu">
+                    <span id="dropdown-button-text">Select a Pet</span>
+                    <span class="icon is-small">
+                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                    </span>
+                </button>
+            </div>
+            <div class="dropdown-menu" id="dropdown-menu" role="menu" style="min-width: auto !important;">
+                <div class="dropdown-content">
+                    {% if owner_pets %}
+                        {% for pet in owner_pets %}
+                            <a href="#" class="dropdown-item" data-value="{{ pet.id }}" data-display="{{ pet.name }}">
+                                {% if pet.type|lower == "dog" %}
+                                <i class="fas fa-dog" style="margin-right:5px;"></i>
+                                {% elif pet.type|lower == "cat" %}
+                                <i class="fas fa-cat " style="margin-right:5px;"></i>
+                                {% elif pet.type|lower == "fish" %}
+                                <i class="fas fa-fish" style="margin-right:5px;"></i>
+                                {% elif pet.type|lower == "dragon" %}
+                                    <i class="fa-solid fa-dragon" style="margin-right:5px;"></i>
+                                {% else %}
+                                <i class="fas fa-paw " style="margin-right:5px;"></i>
+                                {% endif %}
 
-                                    {{ pet.name }}
-                                </a>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
+                                {{ pet.name }}
+                            </a>
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
+        </div>
+        <div style="margin-left: 8px; margin-top: -3px">
+            <a class="button is-rounded is-pistachio is-outlined" href="/dashboard/manage/add-pet/" style="background-color: white; color: #8ed081;"><i class="fa-solid fa-plus m-icon"></i>Register a pet</a>
         </div>
     </div>
 
@@ -130,30 +127,30 @@
                 <div class="card">
                     <header class="card-header">
                         <p class="card-header-title">
-                            <i class="fas fa-utensils" style="margin-right:5px;"></i> Food &amp; Water
+                            <i class="fas fa-bone" style="margin-right:8px;"></i> Food &amp; Water
                         </p>
                     </header>
                     <div class="card-content">
                         <div class="content">
                             {% with pet.food_logs.all|dictsortreversed:"created_at"|first as log %}
                                 {% if log %}
-                                    <p style="margin: 0;"><strong>Food:</strong> {{ log.quantity }}%
-                                        <progress class="progress is-success" value="{{ log.quantity }}" max="100">
+                                    <p style="margin: 0;"><strong><i class="fa-solid fa-bowl-food" style="margin-right: 6px"></i>Food</strong> {{ log.quantity }}%
+                                        <progress class="progress" style="--bulma-progress-value-background-color: #8ed081" value="{{ log.quantity }}" max="100">
                                             {{ log.quantity }}%
                                         </progress>
                                     </p>
                                 {% else %}
-                                    <p style="margin: 0;"><strong>Food:</strong> <span class="has-text-weight-bold">No data</span></p>
+                                    <p style="margin: 0;"><strong><i class="fa-solid fa-bowl-food" style="margin-right: 6px"></i>Food</strong> <span class="has-text-weight-bold">No data</span></p>
                                 {% endif %}
                             {% endwith %}
                             {% with pet.water_logs.all|dictsortreversed:"created_at"|first as log %}
                                 {% if log %}
-                                    <p style="margin: 0;"><strong>Water:</strong> {{ log.quantity }}%</p>
+                                    <p style="margin: 0;"><strong><i class="fa-solid fa-glass-water" style="margin-right: 8px;"></i>Water</strong> {{ log.quantity }}%</p>
                                     <progress class="progress is-info" value="{{ log.quantity }}" max="100">
                                         {{ log.quantity }}%
                                     </progress>
                                 {% else %}
-                                    <p style="margin: 0;"><strong>Water:</strong> <span class="has-text-weight-bold">No data</span></p>
+                                    <p style="margin: 0;"><strong><i class="fa-solid fa-glass-water" style="margin-right: 8px;"></i>Water</strong> <span class="has-text-weight-bold">No data</span></p>
                                 {% endif %}
                             {% endwith %}
                             {% with pet.water_logs.all|dictsortreversed:"created_at"|first as log %}

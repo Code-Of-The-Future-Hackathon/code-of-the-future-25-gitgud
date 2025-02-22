@@ -5,14 +5,17 @@
 {% block content %}
     <div class="section">
         <div class="container">
-            <h1 class="title has-text-centered">Manage Door Settings for {{ pet.name }} <br><br><a class="button is-warning" href="/dashboard/?pet_id={{ pet.id }}">Back to Dashboard</a></h1>
+            <div style="display: flex; text-align: center; margin-bottom: 20px; margin-top: -20px">
+                <a class="button is-danger" href="/dashboard/?pet_id={{ pet.id }}" style="position: absolute"><i class="fa-solid fa-arrow-left m-icon"></i>Back</a>
+                <h1 class="title has-text-centered" style="width: 100%">Manage Door Settings for {{ pet.name }}</h1>
+            </div>
 
             <form id="manage-door-form">
                 <div class="columns">
                     <div class="column">
                         <div class="card">
                             <header class="card-header">
-                                <p class="card-header-title">Door Settings</p>
+                                <p class="card-header-title"><i class="fa-solid fa-gear m-icon"></i>Door Settings</p>
                             </header>
                             <div class="card-content">
                                 <!-- Door Mode Dropdown -->
@@ -32,7 +35,7 @@
                                     <div class="field">
                                         <div class="control">
                                             <label class="checkbox">
-                                                <input type="checkbox" id="always_open" name="always_open" {% if pet.always_open %}checked{% endif %}>
+                                                <i class="fa-solid fa-lock-open m-icon"></i><input type="checkbox" id="always_open" name="always_open" {% if pet.always_open %}checked{% endif %}>
                                                 Always Open
                                             </label>
                                         </div>
@@ -81,7 +84,7 @@
                 <!-- Save Button -->
                 <div class="field">
                     <div class="control">
-                        <button id="save-door-settings" type="button" class="button is-primary is-fullwidth">Save</button>
+                        <button id="save-door-settings" type="button" class="button is-fullwidth is-pistachio"><i class="fa-solid fa-floppy-disk m-icon"></i>Save</button>
                     </div>
                 </div>
             </form>

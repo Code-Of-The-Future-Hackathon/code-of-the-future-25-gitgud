@@ -10,6 +10,7 @@ class Pet(models.Model):
         ('parrot', 'Parrot'),
         ('hamster', 'Hamster'),
         ('fish', 'Fish'),
+        ('dragon', 'Dragon'),
         ('other', 'Other'),
     )
 
@@ -25,7 +26,8 @@ class Pet(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
-    dob = models.DateField()
+    dob = models.DateField(default=None, null=True)
+    age = models.IntegerField(default=0)
     type = models.CharField(max_length=50, choices=PET_TYPE)
     owner = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -89,7 +91,7 @@ class FoodLog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='food_logs')
     quantity = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, editable=True)
 
     def __str__(self):
         return f"{self.pet.name} - {self.created_at}"
@@ -99,7 +101,7 @@ class WaterLog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='water_logs')
     quantity = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField()
 
     def __str__(self):
         return f"{self.pet.name} - {self.created_at}"

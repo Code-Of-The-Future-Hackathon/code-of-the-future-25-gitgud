@@ -5,7 +5,10 @@
 {% block content %}
     <div class="section">
         <div class="container">
-            <h1 class="title has-text-centered">Manage Location for {{ pet.name }} <br><br><a class="button is-warning" href="/dashboard/?pet_id={{ pet.id }}">Back to Dashboard</a></h1>
+            <div style="display: flex; text-align: center; margin-bottom: 20px; margin-top: -20px">
+                <a class="button is-danger" href="/dashboard/?pet_id={{ pet.id }}" style="position: absolute"><i class="fa-solid fa-arrow-left m-icon"></i>Back</a>
+                <h1 class="title has-text-centered" style="width: 100%">Manage Location for {{ pet.name }}</h1>
+            </div>
             {% with pet.location_logs.all|dictsortreversed:"created_at"|first as log %}
                 {% if log %}
                     <div class="card" style="margin-bottom: 20px;">

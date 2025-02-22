@@ -26,6 +26,10 @@
             --ebony: #4B543B;
         }
 
+        body {
+            background: #F3E5AB; background: linear-gradient(to bottom, #F3E5AB 0%, #E4D69C 100%); background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #F3E5AB), color-stop(100%, #E4D69C)); background: -webkit-linear-gradient(top, #F3E5AB 0%, #E4D69C 100%); background: -moz-linear-gradient(top, #F3E5AB 0%, #E4D69C 100%); background: -o-linear-gradient(top, #F3E5AB 0%, #E4D69C 100%); background: -ms-linear-gradient(top, #F3E5AB 0%, #E4D69C 100%); filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F3E5AB', endColorstr='#E4D69C', GradientType=0); border: 1px solid #D5C78D; box-shadow: inset 0 1px 0 #FFF4BA; -webkit-box-shadow: inset 0 1px 0 #FFF4BA; -moz-box-shadow: inset 0 1px 0 #FFF4BA;
+        }
+
         /* Navbar enhancements */
         .navbar {
             display: flex;
@@ -37,22 +41,22 @@
             background-color: white;
         }
         .navbar-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(142, 208, 129, 0.58);
         }
+
         .navbar-item {
             color: var(--ebony);
         }
+
         .navbar-brand .navbar-item {
             font-weight: bold;
         }
+
         /* Adjust profile dropdown alignment */
         .navbar-dropdown {
             min-width: 180px;
         }
 
-        body {
-            background-color: var(--vanilla);
-        }
         #map {
             width: 500px;
             height: 400px;
@@ -60,19 +64,44 @@
             border: 1px solid var(--ebony);
             background: none;
         }
+
+        .is-pistachio {
+            background-color: var(--pistachio);
+            border-color: var(--pistachio);
+            color: white;
+        }
+
+        .button.is-pistachio:hover {
+            background-color: #6aaa63;
+            border-color: #6aaa63;
+        }
+
+        .is-food {
+            background-color: #F0A202;
+            border-color: #F0A202;
+            color: white;
+        }
+
+        .button.is-food:hover {
+            background-color: #CD8B00FF;
+            border-color: #CD8B00FF;
+        }
+
+        .m-icon {
+            margin-right: 8px
+        }
     </style>
 </head>
 <body>
-<div style="margin-top: 32px"></div>
+<div style="padding-top: 32px"></div>
 <nav class="navbar" role="navigation" aria-label="main navigation" id="navbar">
     <div class="navbar-brand">
         <!-- Home Button -->
         <a class="navbar-item" href="/">
-            <span class="icon"><i class="fas fa-home"></i></span>
-            <span>Home</span>
+            <img src="{% static "/image/logo-green-nobg.png" %}">
         </a>
         <a class="navbar-item" href="/dashboard/">
-            <span class="icon"><i class="fa-solid fa-gauge"></i></span>
+            <i class="fa-solid fa-chart-simple"></i>
             <span>Dashboard</span>
         </a>
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMain">
@@ -116,6 +145,9 @@
             document.getElementById("navbar").style.top = "0";
         } else {
             document.getElementById("navbar").style.top = "-10rem";
+        }
+        if (window.scrollY === 0) {
+            document.getElementById("navbar").style.top = "0";
         }
         prevScrollpos = currentScrollPos;
     }

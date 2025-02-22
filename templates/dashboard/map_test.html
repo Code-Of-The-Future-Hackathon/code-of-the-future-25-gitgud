@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Map Click Example{% endblock %}
+
+{% block content %}
+    <div class="section">
+        <div class="container">
+
+            <h1 class="title has-text-centered">Click to Place a Marker</h1>
+
+            <!--
+              A relatively-positioned wrapper so the coordinate overlay can be placed
+              absolutely on top of the map.
+            -->
+            <div style="position: relative; width: 100%; height: 500px;">
+
+                <!-- Map Container -->
+                <div
+                        id="map"
+                        style="width: 100%; height: 100%; background: #fafafa; border: 1px solid #ccc;"
+                >
+                </div>
+
+                <!-- Mouse Coordinates Overlay -->
+                <div
+                        id="coords-overlay"
+                        style="
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background-color: rgba(255, 255, 255, 0.7);
+          padding: 5px 10px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-size: 14px;
+        "
+                >
+                    Coords: (–, –)
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load the background image to get width/height
+            var img = new Image();
+            img.src = "{% static 'image/test.png' %}";
+
+            img.onload = function() {
+                var imgWidth = img.naturalWidth;
+                var imgHeight = img.naturalHeight;
+
+                // Define the image bounds for Leaflet
+                var bounds = [[0, 0], [imgHeight, imgWidth]];
+
+                // Calculate a basic minimum zoom so the entire image fits the container
+                var container = document.getElementById('map');
+                var containerWidth = container.clientWidth;
+                var containerHeight = container.clientHeight;
+                // Use log2 to derive a suitable min zoom
+                var minZoom = Math.log2(
+                    Math.min(containerWidth / imgWidth, containerHeight / imgHeight)
+                );
+
+                // Initialize the Leaflet map
+                var map = L.map('map', {
+                    crs: L.CRS.Simple,
+                    minZoom: minZoom,
+                    maxZoom: 2,
+                    zoom: 0,
+                    maxBounds: bounds,
+                    maxBoundsViscosity: 1.0,
+                    zoomControl: true,
+                    scrollWheelZoom: true
+                });
+
+                // Overlay the image
+                L.imageOverlay(img.src, bounds).addTo(map);
+                map.fitBounds(bounds);
+
+                // Mouse coordinates overlay
+                var coordsOverlay = document.getElementById('coords-overlay');
+
+                // Update coords on mouse move
+                map.on('mousemove', function(e) {
+                    // In CRS.Simple, lat ~ y, lng ~ x
+                    var lat = e.latlng.lat.toFixed(2);
+                    var lng = e.latlng.lng.toFixed(2);
+                    coordsOverlay.textContent = "Coords: (" + lat + ", " + lng + ")";
+                });
+
+                // Clear coords when mouse leaves map (optional)
+                map.on('mouseout', function() {
+                    coordsOverlay.textContent = "Coords: (–, –)";
+                });
+
+                // Place marker on click
+                map.on('click', function(e) {
+                    var lat = e.latlng.lat.toFixed(2);
+                    var lng = e.latlng.lng.toFixed(2);
+
+                    // Create a marker at the click location
+                    var marker = L.marker([lat, lng]).addTo(map);
+                    // Show coordinates in popup
+                    marker.bindPopup("Lat: " + lat + "<br>Lng: " + lng).openPopup();
+                });
+            };
+        });
+    </script>
+{% endblock %}

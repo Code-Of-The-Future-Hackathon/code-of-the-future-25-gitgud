@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Location History{% endblock %}
+
+{% block content %}
+    <div class="section">
+        <div class="container">
+            <h1 class="title has-text-centered">Last 10 Locations</h1>
+
+            <!-- Map Container -->
+            <div id="map" style="width: 100%; height: 500px; margin-bottom: 20px;"></div>
+
+
+            <!-- Optionally show each log's info below the map -->
+            {% for log in locationlogs %}
+                <div class="card" style="margin-bottom: 20px;">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            {{ forloop.counter }}. {{ log.pet.name }} @ {{ log.created_at }}
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            <p><strong>Description:</strong> {{ log.text }}</p>
+                            <p><strong>Coordinates:</strong> ({{ log.latitude }}, {{ log.longitude }})</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Collect location logs as a JavaScript array of objects
+            var logs = [
+                {% for log in locationlogs %}
+                    {
+                        'latitude': {{ log.latitude }},
+                        'longitude': {{ log.longitude }},
+                        'text': "{{ log.text|escapejs }}",
+                        'created_at': "{{ log.created_at|date:'Y-m-d H:i:s' }}",
+                        'pet_name': "{{ log.pet.name|escapejs }}"
+                    }
+                    {% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            // Load the background image (map/floor plan) to get its dimensions
+            var img = new Image();
+            // Adjust path to match where your static image is located
+            img.src = '/static/image/test.png';
+
+            img.onload = function() {
+                var imgWidth = img.naturalWidth,
+                    imgHeight = img.naturalHeight;
+
+                // Define image bounds
+                var bounds = [[0, 0], [imgHeight, imgWidth]];
+
+                // Calculate minZoom so that the entire image fits within the container
+                var container = document.getElementById('map');
+                var containerWidth = container.clientWidth,
+                    containerHeight = container.clientHeight;
+                // Basic approach to calculate minZoom (may be refined)
+                var minZoom = Math.log2(Math.min(containerWidth / imgWidth, containerHeight / imgHeight));
+
+                // Initialize Leaflet map with Simple CRS
+                var map = L.map('map', {
+                    crs: L.CRS.Simple,
+                    minZoom: minZoom,
+                    maxZoom: 2,
+                    zoom: 0,
+                    maxBounds: bounds,
+                    maxBoundsViscosity: 1.0,
+                    zoomControl: true,
+                    scrollWheelZoom: true
+                });
+
+                // Add the image overlay
+                L.imageOverlay(img.src, bounds).addTo(map);
+                map.fitBounds(bounds);
+
+                // Prepare array of [lat, lng] for the polyline
+                // (Ensure the logs are in chronological order if you want a correctly connected path.)
+                var latLngs = [];
+                logs.forEach(function(log) {
+                    latLngs.push([log.latitude, log.longitude]);
+                });
+
+                // Draw polyline only if there's more than one point
+                if (latLngs.length > 1) {
+                    L.polyline(latLngs, {
+                        color: 'blue',
+                        weight: 3
+                    }).addTo(map);
+                }
+
+                // Place markers and popups
+                logs.forEach(function(log) {
+                    L.marker([log.latitude, log.longitude])
+                        .addTo(map)
+                        .bindPopup(
+                            "<strong>" + log.pet_name + "</strong><br>" +
+                            log.created_at + "<br>" +
+                            log.text
+                        );
+                });
+            };
+        });
+    </script>
+{% endblock %}

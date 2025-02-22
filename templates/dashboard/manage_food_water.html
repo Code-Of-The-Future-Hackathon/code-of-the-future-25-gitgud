@@ -13,41 +13,84 @@
 {% block content %}
     <div class="section">
         <div class="container">
-            <h1 class="title has-text-centered">
-                Manage Food &amp; Water Settings for {{ pet.name }}<br><br>
-                <a class="button is-warning" href="/dashboard/?pet_id={{ pet.id }}">Back to Dashboard</a>
-            </h1>
+            <div style="display: flex; text-align: center; margin-bottom: 20px; margin-top: -20px">
+                <a class="button is-danger" href="/dashboard/?pet_id={{ pet.id }}" style="position: absolute"><i class="fa-solid fa-arrow-left m-icon"></i>Back</a>
+                <h1 class="title has-text-centered" style="width: 100%">Manage Food &amp; Water Settings for {{ pet.name }}</h1>
+            </div>
+
             <form id="manage-settings-form">
                 <div class="columns is-multiline">
                     <div class="column is-full">
                         <div class="card">
                             <header class="card-header">
-                                <p class="card-header-title">Feeder Data</p>
+                                <p class="card-header-title"><i class="fa-solid fa-chart-line m-icon"></i>Consumption &amp; Prediction</p>
                             </header>
-                            <div class="columns is-multiline is-centered" id="datacol">
-                                <div class="column is-half">
-                <span class="tag is-light" style="width: 100%; height: 100% !important;">
-                  <i class="fas fa-clock" style="margin-right:5px;"></i>dwa
-                </span>
-                                </div>
-                                <div class="column is-half">
-                <span class="tag is-light" style="width: 100%; height: 100% !important;">
-                  <i class="fas fa-clock" style="margin-right:5px;"></i>dwa
-                </span>
-                                </div>
-                                <div class="column is-half">
-                <span class="tag is-light" style="width: 100%; height: 100% !important;">
-                  <i class="fas fa-clock" style="margin-right:5px;"></i>dwa
-                </span>
-                                </div>
-                                <div class="column is-half">
-                <span class="tag is-light" style="width: 100%; height: 100% !important;">
-                  <i class="fas fa-clock" style="margin-right:5px;"></i>dwa
-                </span>
+                            <div class="card-content">
+                                <!--
+                                  Example layout: two columns side-by-side, one for Food, one for Water.
+                                  Each column includes last week's consumption plus future predictions.
+                                -->
+                                <div class="columns">
+                                    <!-- FOOD -->
+                                    <div class="column is-half">
+                                        <article class="message is-warning">
+                                            <div class="message-header">
+                                                <p><i class="fa-solid fa-carrot m-icon"></i>Food Consumption</p>
+                                            </div>
+                                            <div class="message-body">
+                                                <p class="subtitle is-6">
+                                                    <strong>Last 7 days consumed:</strong>
+                                                    {{ last_week_food }} g
+                                                </p>
+                                                <hr>
+                                                <p class="subtitle is-6">
+                                                    <strong>Next 7 days (predicted):</strong>
+                                                    {{ predicted_food_week|floatformat:2 }} g
+                                                </p>
+                                                <p class="subtitle is-6">
+                                                    <strong>Next 30 days (predicted):</strong>
+                                                    {{ predicted_food_month|floatformat:2 }} g
+                                                </p>
+                                                <p class="subtitle is-6">
+                                                    <strong>Next 90 days (predicted):</strong>
+                                                    {{ predicted_food_quarter|floatformat:2 }} g
+                                                </p>
+                                            </div>
+                                        </article>
+                                    </div>
+
+                                    <!-- WATER -->
+                                    <div class="column is-half">
+                                        <article class="message is-info">
+                                            <div class="message-header">
+                                                <p><i class="fa-solid fa-faucet m-icon"></i>Water Consumption</p>
+                                            </div>
+                                            <div class="message-body">
+                                                <p class="subtitle is-6">
+                                                    <strong>Last 7 days consumed:</strong>
+                                                    {{ last_week_water }} ml
+                                                </p>
+                                                <hr>
+                                                <p class="subtitle is-6">
+                                                    <strong>Next 7 days (predicted):</strong>
+                                                    {{ predicted_water_week|floatformat:2 }} ml
+                                                </p>
+                                                <p class="subtitle is-6">
+                                                    <strong>Next 30 days (predicted):</strong>
+                                                    {{ predicted_water_month|floatformat:2 }} ml
+                                                </p>
+                                                <p class="subtitle is-6">
+                                                    <strong>Next 90 days (predicted):</strong>
+                                                    {{ predicted_water_quarter|floatformat:2 }} ml
+                                                </p>
+                                            </div>
+                                        </article>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
 
                     <div class="column is-half">
                         <div class="card">
@@ -97,13 +140,13 @@
                                 <div class="field">
                                     <label class="label">Food Quantity (grams)</label>
                                     <div class="control">
-                                        <input class="input" type="number" id="automatic_food_quantity" name="automatic_food_quantity" placeholder="Enter food quantity" value="{{ pet.automatic_food_quantity }}">
+                                        <input class="input" type="number" id="automatic_food_quantity" name="automatic_food_quantity" placeholder="Enter food quantity" min="0" value="{{ pet.automatic_food_quantity }}">
                                     </div>
                                 </div>
                                 <div id="food_manual_options" style="display: none;">
                                     <div class="field">
                                         <div class="control">
-                                            <button id="feed-button" type="button" class="button is-warning is-fullwidth">Feed</button>
+                                            <button id="feed-button" type="button" class="button is-fullwidth is-food"><i class="fa-solid fa-bowl-food m-icon"></i>Feed</button>
                                         </div>
                                     </div>
                                 </div>
@@ -159,13 +202,13 @@
                                 <div class="field">
                                     <label class="label">Water Quantity (ml)</label>
                                     <div class="control">
-                                        <input class="input" type="number" id="automatic_water_quantity" name="automatic_water_quantity" placeholder="Enter water quantity" value="{{ pet.automatic_water_quantity }}">
+                                        <input class="input" min=0 type="number" id="automatic_water_quantity" name="automatic_water_quantity" placeholder="Enter water quantity" value="{{ pet.automatic_water_quantity }}">
                                     </div>
                                 </div>
                                 <div id="water_manual_options" style="display: none;">
                                     <div class="field">
                                         <div class="control">
-                                            <button id="water-button" type="button" class="button is-info is-fullwidth">Water</button>
+                                            <button id="water-button" type="button" class="button is-info is-fullwidth"><i class="fa-solid fa-droplet m-icon"></i>Water</button>
                                         </div>
                                     </div>
                                 </div>
@@ -176,7 +219,7 @@
                 <!-- Save Button -->
                 <div class="field">
                     <div class="control">
-                        <button id="save-settings" type="button" class="button is-primary is-fullwidth">Save</button>
+                        <button id="save-settings" type="button" class="button is-fullwidth is-pistachio"><i class="fa-solid fa-floppy-disk m-icon"></i>Save</button>
                     </div>
                 </div>
             </form>

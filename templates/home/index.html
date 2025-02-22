@@ -218,12 +218,15 @@
     <script>
         var prevScrollpos = window.scrollY;
         window.onscroll = function () {
-        var currentScrollPos = window.scrollY;
-        if (prevScrollpos > currentScrollPos) {
-            document.getElementById("navbar").style.top = "0";
-        } else {
-            document.getElementById("navbar").style.top = "-10rem";
-        }
+            var currentScrollPos = window.scrollY;
+            if (prevScrollpos > currentScrollPos) {
+                document.getElementById("navbar").style.top = "0";
+            } else {
+                document.getElementById("navbar").style.top = "-10rem";
+            }
+            if (window.scrollY === 0) {
+                document.getElementById("navbar").style.top = "0";
+            }
             prevScrollpos = currentScrollPos;
         }
     </script>
