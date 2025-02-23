@@ -89,7 +89,7 @@ def manage_food_water(request, id):
 
         # Convert percentage to grams if between 0 and 100
         try:
-            qty = int(automatic_food_quantity)
+            pet.automatic_food_quantity = int(automatic_food_quantity)
         except (ValueError, TypeError):
             pet.automatic_food_quantity = 0
 
@@ -201,51 +201,6 @@ def manage_food_water(request, id):
     return render(request, 'dashboard/manage_food_water.html', context)
 
 
-def temp_generate_food_log(request, id):
-    """Generate 2 weeks of hourly water logs, ~750 ml/day via ~2 daily refills."""
-    pet = get_object_or_404(Pet, id=id)
-
-    # We'll log from 14 days ago up to 'now'
-    end_date = timezone.now()
-    start_date = end_date - timedelta(days=14)
-
-    # We track the current hour in this loop
-    current_time = start_date
-    # Start the bowl at 100% (which is 400 ml full)
-    current_quantity = 100
-
-    # We'll store new WaterLog objects in memory first, then bulk-create them
-    logs_to_create = []
-
-    while current_time <= end_date:
-        hour = current_time.hour
-
-        # Refill at 07:00 and 19:00
-        if hour == 7 or hour == 19:
-            current_quantity = 100
-        else:
-            # Random usage between 5–11% each hour
-            usage_percent = random.randint(5, 11)
-            current_quantity -= usage_percent
-            if current_quantity < 0:
-                current_quantity = 0
-
-        # Build WaterLog object (don't save individually)
-        water_log = WaterLog(
-            id=uuid.uuid4(),
-            pet=pet,
-            quantity=current_quantity,  # 0–100
-            created_at=current_time  # works only if not auto_now_add
-        )
-        logs_to_create.append(water_log)
-
-        # Increment by one hour
-        current_time += timedelta(hours=1)
-
-    # Bulk-insert all logs
-    WaterLog.objects.bulk_create(logs_to_create)
-
-    return HttpResponse("Water logs (~750 ml/day) generated successfully!")
 
 
 def manage_door(request, id):
@@ -338,9 +293,11 @@ def location_history(request, id):
     )
     # If you need them in chronological order for correct path visualization:
     locationlogs = sorted(locationlogs, key=lambda x: x.created_at)
+    pet = get_object_or_404(Pet, id=id)
 
     context = {
-        'locationlogs': locationlogs
+        'locationlogs': locationlogs,
+        'pet': pet,
     }
     return render(request, 'dashboard/location_history.html', context)
 

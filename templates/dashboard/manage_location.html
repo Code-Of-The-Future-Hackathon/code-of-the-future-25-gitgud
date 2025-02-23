@@ -6,14 +6,17 @@
     <div class="section">
         <div class="container">
             <div style="display: flex; text-align: center; margin-bottom: 20px; margin-top: -20px">
-                <a class="button is-danger" href="/dashboard/?pet_id={{ pet.id }}" style="position: absolute"><i class="fa-solid fa-arrow-left m-icon"></i>Back</a>
+                <div style="position: absolute; display: flex; gap: 8px">
+                    <a class="button is-danger" href="/dashboard/?pet_id={{ pet.id }}"><i class="fa-solid fa-arrow-left m-icon"></i>Back</a>
+                    <a class="button is-info" href="/dashboard/manage/location/{{ pet.id }}/history"><i class="fa-solid fa-clock-rotate-left m-icon"></i>History</a>
+                </div>
                 <h1 class="title has-text-centered" style="width: 100%">Manage Location for {{ pet.name }}</h1>
             </div>
             {% with pet.location_logs.all|dictsortreversed:"created_at"|first as log %}
                 {% if log %}
                     <div class="card" style="margin-bottom: 20px;">
                         <header class="card-header">
-                            <p class="card-header-title">Last Known Location</p>
+                            <p class="card-header-title"><i class="fa-solid fa-location-dot m-icon"></i>Last Known Location</p>
                         </header>
                         <div class="card-content">
                             <div class="content">

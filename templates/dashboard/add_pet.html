@@ -4,11 +4,12 @@
 {% block content %}
     <section class="hero is-fullheight" style="background: url('{% static "image/add-pet-bg.jpg" %}') no-repeat center center; background-size: cover;">
         <div class="hero-body">
-            <div class="container">
+            <div class="container" style="margin-top: -80px">
                 <div class="columns is-centered">
                     <div class="column is-4-desktop is-6-tablet">
                         <div class="box" style="box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
                             <h1 class="title has-text-centered">Register Your Pet</h1>
+                            <a class="button is-danger" href="/dashboard/?pet_id={{ pet.id }}" style="position: absolute; top: -48px; left: 34%"><i class="fa-solid fa-arrow-left m-icon"></i>Back</a>
                             <form method="POST">
                                 {% csrf_token %}
                                 <!-- Pet Name -->
@@ -20,7 +21,7 @@
                                 </div>
                                 <!-- Pet Type Dropdown -->
                                 <div class="field">
-                                    <label class="label">Type</label>
+                                    <label class="label"><i class="fa-solid fa-dog m-icon"></i>Type</label>
                                     <div class="control">
                                         <div class="select is-fullwidth">
                                             <select name="type" required>
@@ -42,14 +43,14 @@
                                 </div>
                                 <!-- Birthday Date Field -->
                                 <div class="field" id="birthdayField" style="display: none;">
-                                    <label class="label">Birthday</label>
+                                    <label class="label"><i class="fa-regular fa-calendar m-icon"></i>Birthday</label>
                                     <div class="control">
                                         <input class="input" type="date" name="birthday">
                                     </div>
                                 </div>
                                 <!-- Age Field -->
                                 <div class="field" id="ageField">
-                                    <label class="label">Age (in years)</label>
+                                    <label class="label"><i class="fa-regular fa-calendar m-icon"></i>Age (in years)</label>
                                     <div class="control">
                                         <input class="input" type="number" name="age" min="0" placeholder="Enter pet's age">
                                     </div>
