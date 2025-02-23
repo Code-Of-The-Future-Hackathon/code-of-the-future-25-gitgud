@@ -121,47 +121,29 @@ def manage_food_water(request, id):
         .order_by('created_at')
     )
 
-    # We'll accumulate consumption by (date -> total_consumed).
-    # For daily grouping, we can map each date to the total consumption.
-    # E.g., { '2025-02-15': 150g, '2025-02-16': 80g, ... }
     food_consumption_by_day = defaultdict(float)
     previous_log = None
 
     for log in food_logs:
         if previous_log is not None:
-            # If quantity has decreased, that difference is consumed
             if previous_log.quantity > log.quantity:
                 consumption = previous_log.quantity - log.quantity
-                # Group by the *day* of the previous_log or the current log?
-                # Typically we group by the day we noticed the consumption,
-                # so let's use log.created_at.date().
                 day_str = log.created_at.date().isoformat()
                 food_consumption_by_day[day_str] += consumption
         previous_log = log
 
-    # Total consumption over last 7 days:
     total_consumption_7d = sum(food_consumption_by_day.values())
 
-    # Average daily consumption:
-    # Count how many days we actually have data for, to avoid dividing by 7
-    # if logs exist for fewer days.
     days_of_logs = len(food_consumption_by_day)
     if days_of_logs == 0:
         average_daily_food = 0
     else:
         average_daily_food = total_consumption_7d / days_of_logs
 
-    # Now predict usage:
-    # Next 7 days
     predicted_food_week = average_daily_food * 7
-    # Next 30 days
     predicted_food_month = average_daily_food * 30
-    # Next 90 days
     predicted_food_quarter = average_daily_food * 90
 
-    #
-    # 2) WATER CONSUMPTION
-    #
     water_logs = (
         pet.water_logs
         .filter(created_at__gte=one_week_ago)
@@ -190,9 +172,6 @@ def manage_food_water(request, id):
     predicted_water_month = average_daily_water * 30
     predicted_water_quarter = average_daily_water * 90
 
-    #
-    # Debug prints or logs
-    #
     print("FOOD -> 7d:", total_consumption_7d,
           "daily avg:", average_daily_food,
           "predictions:", predicted_food_week,
@@ -379,9 +358,9 @@ def add_pet(request):
         birthday = request.POST.get('birthday')
 
         if exact_birthday:
-            pet = Pet(name=name, type=typeD, dob=birthday, owner=request.user)
+            pet = Pet(name=name, type=typeD, dob=birthday, owner=request.user, exact_birthday=True)
         else:
-            pet = Pet(name=name, type=typeD, age=age, owner=request.user)
+            pet = Pet(name=name, type=typeD, age=age, owner=request.user, exact_birthday=False)
 
         messages.success(request, 'Pet added successfully')
         pet.save()

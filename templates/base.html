@@ -8,7 +8,7 @@
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/smoothness/jquery-ui.css">
@@ -116,7 +116,7 @@
             <!-- Add more navbar items here if needed -->
         </div>
         <div class="navbar-end">
-            <!-- Profile Dropdown -->
+            {% if request.user.is_authenticated %}
             <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link">
                     <img style="border-radius: 15px;" class="is-rounded" onerror="this.src='/static/image/blank-profile.webp'" src="/static/image/pfp/{{ request.user.id }}.jpeg" alt="Profile">
@@ -134,6 +134,16 @@
                     </a>
                 </div>
             </div>
+            {% else %}
+            <a class="navbar-item" href="/accounts/login/">
+                <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
+                <span>Login</span>
+            </a>
+                <a class="navbar-item" href="/accounts/sign-up/">
+                    <span class="icon"><i class="fas fa-user-plus"></i></span>
+                    <span>Sign-up</span>
+                </a>
+            {% endif %}
         </div>
     </div>
 </nav>

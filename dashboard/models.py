@@ -27,6 +27,7 @@ class Pet(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     dob = models.DateField(default=None, null=True)
+    exact_birthday = models.BooleanField(default=False)
     age = models.IntegerField(default=0)
     type = models.CharField(max_length=50, choices=PET_TYPE)
     owner = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE, default=None)

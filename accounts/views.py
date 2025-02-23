@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.handlers.modwsgi import check_password
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from accounts.models import CustomUser
 
@@ -29,7 +29,7 @@ def login_view(request):
         print(email, password)
 
         # use check_password to check if the password is correct
-        user = CustomUser.objects.get(email=email)
+        user = get_object_or_404(CustomUser, email=email)
         if not user.check_password(password):
             user = None
 

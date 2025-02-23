@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load pet_extras %}
 
 {% block title %}Dashboard{% endblock %}
 
@@ -72,6 +73,30 @@
         }
     </style>
 
+    <style>
+        /* Custom styles for the modal */
+        .modal-card-head {
+            background: linear-gradient(135deg, #6b73ff, #000dff);
+        }
+        .modal-card-head .modal-card-title {
+            color: #fff;
+            font-weight: bold;
+        }
+        .modal-card-body {
+            padding: 2rem;
+        }
+        .pet-image img {
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .pet-details h2 {
+            margin-bottom: 0.5rem;
+        }
+        .pet-details p {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+
     <!-- Dropdown Selection Section using Bulma's dropdown -->
     <div class="columns dropdown-section" style="margin-top: 18px">
         <h2 class="title is-4" style="margin-right: 10px; margin-left: 20px;">
@@ -110,8 +135,13 @@
                 </div>
             </div>
         </div>
+
         <div style="margin-left: 8px; margin-top: -3px">
             <a class="button is-rounded is-pistachio is-outlined" href="/dashboard/manage/add-pet/" style="background-color: white; color: #8ed081;"><i class="fa-solid fa-plus m-icon"></i>Register a pet</a>
+        </div>
+
+        <div style="position: absolute; margin-left: 8px; margin-top: -3px; right: 0;">
+            <a class="button is-rounded" id="openmodalBtn" onclick="prepareOpenModalPet()"><i class="fa-solid fa-circle-info"></i>‎</a>
         </div>
     </div>
 
@@ -119,6 +149,90 @@
     <div id="no-info-warning" class="notification is-warning" style="display: none;">
         No pet info available.
     </div>
+
+    <!-- Pet model pop-up -->
+    {% for pet in owner_pets %}
+        <div class="modal" id="pet-modal-{{ pet.id }}">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">{{ pet.name|capfirst }} - Pet Info</p>
+                    <button class="delete" aria-label="close" onclick="closePetInfoModal('{{ pet.id }}')"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div class="columns is-vcentered">
+                        {% if pet.image %}
+                            <div class="column is-one-third pet-image">
+                                <figure class="image is-4by3">
+                                    <img src="{{ pet.image.url }}" alt="{{ pet.name }}">
+                                </figure>
+                            </div>
+                            <div class="column pet-details">
+                                <h2 class="title is-4">{{ pet.name|capfirst }}</h2>
+                                <p class="subtitle is-6"><strong>Type:</strong> {{ pet.type|capfirst }}</p>
+                                <p>
+                                    <strong>Age:</strong>
+                                    {% if pet.exact_birthday %}
+                                        {{ pet.dob|date:"F j, Y" }} ({{ pet.dob|calculate_age }} years old)
+                                    {% else %}
+                                        {{ pet.age }}
+                                    {% endif %}
+                                </p>
+                                <p class="mt-4">
+                                    This lovely pet is full of energy and charm. Discover more details about this adorable companion!
+                                </p>
+                            </div>
+                        {% else %}
+                            <div class="column pet-details">
+                                <h2 class="title is-4">{{ pet.name|capfirst }}</h2>
+                                <p class="subtitle is-6"><strong>Type:</strong> {{ pet.type|capfirst }}</p>
+                                <p>
+                                    <strong>Age:</strong>
+                                    {% if pet.exact_birthday %}
+                                        {{ pet.dob|date:"F j, Y" }} ({{ pet.dob|calculate_age }} years old)
+                                    {% else %}
+                                        {{ pet.age }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </section>
+                <footer class="modal-card-foot" style="justify-content: flex-end;">
+                    <button class="button is-danger" onclick="closePetInfoModal('{{ pet.id }}')">Close</button>
+                </footer>
+            </div>
+        </div>
+
+    {% endfor %}
+
+
+    <script>
+    function prepareOpenModalPet() {
+        let modal = document.getElementById("pet-modal-" + currentPetId);
+        modal.classList.add("is-active");
+    }
+
+    function openPetInfoModal(petId) {
+        let modal = document.getElementById("pet-modal-" + petId);
+        modal.classList.add("is-active");
+    }
+
+    function closePetInfoModal(petId) {
+        let modal = document.getElementById("pet-modal-" + petId);
+        modal.classList.remove("is-active");
+    }
+
+    // on esc press, close all modals
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape") {
+            let modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.classList.remove('is-active');
+            });
+        }
+    });
+    </script>
 
     {% for pet in owner_pets %}
         <div id="widget-container-{{ pet.id }}" class="columns is-multiline" style="display: none;">
@@ -184,7 +298,7 @@
                                 {% if log %}
                                     <p>
                                         <strong>Status:</strong>
-                                        <span class="tag {% if log.status == 'close' %}is-danger{% else %}is-success{% endif %} has-text-weight-bold">
+                                        <span class="tag {% if log.status == 'close' %}is-danger{% else %}is-pistachio{% endif %} has-text-weight-bold">
                                             {% if log.status == 'close' %}
                                                 <i class="fas fa-lock" style="margin-right:5px;"></i>
                                             {% else %}
@@ -195,7 +309,7 @@
                                     </p>
                                     <p>
                                         <strong>Door Mode:</strong>
-                                        <span class="tag {% if log.mode == 'manual' %}is-danger{% else %}is-success{% endif %} has-text-weight-bold">
+                                        <span class="tag {% if log.mode == 'manual' %}is-danger{% else %}is-pistachio{% endif %} has-text-weight-bold">
                                             {% if log.mode == 'manual' %}
                                                 <i class="fas fa-user" style="margin-right:5px;"></i>
                                             {% else %}
@@ -349,6 +463,7 @@
                     equalizeCardHeights(container);
                     loadSavedOrder(firstId, container);
                 });
+                // clear functions
                 let urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.has("pet_id")) {
                     let petIdFromUrl = urlParams.get("pet_id");
